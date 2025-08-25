@@ -6,7 +6,7 @@ import time
 app = Flask(__name__)
 
 # Hugging Face API setup
-API_URL = "https://api-inference.huggingface.co/models/OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
+API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 headers = {
     "Authorization": f"Bearer {os.getenv('HF_API_KEY')}"
 }
@@ -24,7 +24,7 @@ def webhook():
             response = requests.post(API_URL, headers=headers, json={"inputs": user_message}, timeout=10)
 
             # Check for empty response
-            if not response.content:
+            if not response.content or response.status_code != 200:
                 time.sleep(1)
                 continue
 

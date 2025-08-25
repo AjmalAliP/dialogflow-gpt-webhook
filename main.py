@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 import requests
 import os
@@ -6,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Hugging Face API setup
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+API_URL = "https://api-inference.huggingface.co/models/OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
 headers = {"Authorization": f"Bearer {os.getenv('HF_API_KEY')}"}
 
 @app.route('/webhook', methods=['POST'])
@@ -28,7 +27,6 @@ def webhook():
             gpt_reply = f"Unexpected response format: {result}"
     except Exception as e:
         gpt_reply = f"Error processing response: {str(e)}"
-
 
     return jsonify({
         "fulfillmentMessages": [

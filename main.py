@@ -1,0 +1,41 @@
+
+from flask import Flask, request, jsonify
+import requests
+
+app = Flask(__name__)
+
+# Hugging Face API setup
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+import os
+headers = {"Authorization": f"Bearer {os.getenv('HF_API_KEY')}"}
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    req = request.get_json(force=True)
+    user_message = req.get('queryResult', {}).get('queryText', '')
+
+    # Send message to Hugging Face model
+    response = requests.post(API_URL, headers=headers, json={"inputs": user_message})
+    result = response.json()
+
+    # Extract response text
+    if isinstance(result, list) and 'generated_text' in result[0]:
+        gpt_reply = result[0]['generated_text']
+    else:
+        gpt_reply = "Sorry, I couldn't generate a response."
+
+    return jsonify({
+        "fulfillmentMessages": [
+            {
+                "text": {
+                    "text": [gpt_reply]
+                }
+            }
+        ]
+    })
+
+@app.route('/')
+def home():
+    return "Webhook server is running!"
+
+app.run(host='0.0.0.0', port=8080)

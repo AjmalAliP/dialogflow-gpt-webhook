@@ -1,12 +1,12 @@
 
 from flask import Flask, request, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
 # Hugging Face API setup
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-import os
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 headers = {"Authorization": f"Bearer {os.getenv('HF_API_KEY')}"}
 
 @app.route('/webhook', methods=['POST'])

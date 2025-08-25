@@ -19,10 +19,16 @@ def webhook():
     result = response.json()
 
     # Extract response text
-    if isinstance(result, list) and 'generated_text' in result[0]:
-        gpt_reply = result[0]['generated_text']
-    else:
-        gpt_reply = "Sorry, I couldn't generate a response."
+    try:
+        if isinstance(result, list) and 'generated_text' in result[0]:
+            gpt_reply = result[0]['generated_text']
+        elif isinstance(result, dict) and 'generated_text' in result:
+            gpt_reply = result['generated_text']
+        else:
+            gpt_reply = f"Unexpected response format: {result}"
+    except Exception as e:
+        gpt_reply = f"Error processing response: {str(e)}"
+
 
     return jsonify({
         "fulfillmentMessages": [

@@ -16,12 +16,18 @@ def webhook():
     req = request.get_json(force=True)
     user_message = req.get('queryResult', {}).get('queryText', '')
 
-    # Retry logic
     max_retries = 2
     gpt_reply = "I’m thinking… try again in a moment!"
+
     for attempt in range(max_retries):
         try:
             response = requests.post(API_URL, headers=headers, json={"inputs": user_message}, timeout=10)
+
+            # Check for empty response
+            if not response.content:
+                time.sleep(1)
+                continue
+
             result = response.json()
 
             # Handle different response formats
@@ -34,9 +40,14 @@ def webhook():
             elif 'error' in result:
                 gpt_reply = f"Error from model: {result['error']}"
                 break
+            else:
+                gpt_reply = f"Unexpected response format: {result}"
+                break
+
         except Exception as e:
             gpt_reply = f"Exception occurred: {str(e)}"
-            time.sleep(1)  # brief pause before retry
+            time.sleep(1)
+
     return jsonify({
         "fulfillmentMessages": [
             {
